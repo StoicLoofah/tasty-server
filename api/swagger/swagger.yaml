@@ -42,11 +42,33 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /bookmarks:
+    x-swagger-router-controller: bookmarks
+    get:
+      description: Returns a list of Bookmarks to the caller
+      operationId: bookmarks
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/BookmarksResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
   HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  BookmarksResponse:
     required:
       - message
     properties:
