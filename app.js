@@ -21,3 +21,7 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
     console.log('try this:\ncurl http://127.0.0.1:' + port + '/hello?name=Scott');
   }
 });
+
+// connect to the database
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/tasty');

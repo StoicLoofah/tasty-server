@@ -2,25 +2,28 @@
 
 var util = require('util');
 
+var Bookmark = require('../../models/bookmark').Bookmark;
+
 module.exports = {
-    bookmarks: bookmarks
+    createBookmark: createBookmark,
+    getBookmarks: getBookmarks
 }
 
-function bookmarks(req, res) {
-    res.json([
-        {
-            notes: '',
-            tags: ['Tech', 'News'],
-            timeAdded: new Date(),
-            title: 'The Verge',
-            url: 'http://theverge.com',
-        },
-        {
-            notes: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-            tags: ['Entertainment'],
-            timeAdded: new Date(),
-            title: 'Geek & Sundry',
-            url: 'http://geekandsundry.com',
-        }
-    ]);
+function createBookmark(req, res) {
+    var bookmark = new Bookmark({
+        notes: req.body.notes,
+        title: req.body.title,
+        url: req.body.url,
+    });
+    bookmark.save(function(err, bookmark) {
+        if(err) return console.error(err);
+        res.status(201).send(bookmark);
+    });
+}
+
+function getBookmarks(req, res) {
+    Bookmark.find({}, function(err, bookmarks) {
+        if(err) return console.error(err);
+        res.send(bookmarks)
+    });
 }
