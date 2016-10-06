@@ -38,6 +38,26 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"  
+    delete:
+      description: Delete an existing bookmark
+      operationId: deleteBookmark
+      parameters:
+        - name: bookmark_id
+          in: path
+          description: id for the deleted Bookmark
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/DeleteResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /bookmarks:
     x-swagger-router-controller: bookmarks
     get:
@@ -97,3 +117,7 @@ definitions:
     properties:
       message:
         type: string
+  DeleteResponse:
+    properties:
+      removed: 
+        type: number

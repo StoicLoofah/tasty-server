@@ -7,11 +7,18 @@ var Tag = require('../../models/tag').Tag;
 
 module.exports = {
     createBookmark: createBookmark,
+    deleteBookmark: deleteBookmark,
     getBookmarks: getBookmarks,
     updateBookmark: updateBookmark
 }
 
 function getOrCreateTags(tagNames, callback) {
+
+    if(!tagNames) {
+        callback([]);
+        return;
+    }
+
     var realTags = [];
     var collectTags = function(tag) {
         realTags.push(tag);
@@ -24,11 +31,12 @@ function getOrCreateTags(tagNames, callback) {
         var query = Tag.findOne({name: tagName}, function(err, tag) {
             if(tag) {
                 collectTags(tag);
+            } else {
+                tag = new Tag({name: tagName});
+                tag.save(function(err, tag) {
+                    collectTags(tag);
+                });
             }
-            tag = new Tag({name: tagName});
-            tag.save(function(err, tag) {
-                collectTags(tag);
-            });
         });
     });
 
@@ -47,6 +55,13 @@ function createBookmark(req, res) {
             if(err) return console.error(err);
             res.status(201).send(bookmark.toJson());
         });
+    });
+}
+
+function deleteBookmark(req, res) {
+    Bookmark.remove({_id: req.swagger.params.bookmark_id.value}, function(err, removed) {
+        if(err) return console.error(err);
+        res.send({removed: 1});
     });
 }
 
