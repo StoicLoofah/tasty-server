@@ -11,6 +11,7 @@ var Bookmark = new Schema({
 
 Bookmark.methods.toJson = function() {
     var data = {
+        id: this._id,
         notes: this.notes,
         tags: [],
         timeAdded: this.timeAdded,

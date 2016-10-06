@@ -7,29 +7,20 @@ var Tag = require('../../models/tag').Tag;
 
 module.exports = {
     createBookmark: createBookmark,
-    getBookmarks: getBookmarks
+    getBookmarks: getBookmarks,
+    updateBookmark: updateBookmark
 }
 
-function createBookmark(req, res) {
-    var bookmark = new Bookmark({
-        notes: req.body.notes,
-        title: req.body.title,
-        url: req.body.url,
-    });
-
+function getOrCreateTags(tagNames, callback) {
     var realTags = [];
     var collectTags = function(tag) {
         realTags.push(tag);
-        if(realTags.length == req.body.tags.length) {
-            bookmark.tags = realTags;
-            bookmark.save(function(err, bookmark) {
-                if(err) return console.error(err);
-                res.status(201).send(bookmark.toJson());
-            });
+        if(realTags.length == tagNames.length) {
+            callback(realTags);
         }
     }
 
-    req.body.tags.forEach(function(tagName) {
+    tagNames.forEach(function(tagName) {
         var query = Tag.findOne({name: tagName}, function(err, tag) {
             if(tag) {
                 collectTags(tag);
@@ -41,6 +32,40 @@ function createBookmark(req, res) {
         });
     });
 
+}
+
+function createBookmark(req, res) {
+    var bookmark = new Bookmark({
+        notes: req.body.notes,
+        title: req.body.title,
+        url: req.body.url,
+    });
+
+    getOrCreateTags(req.body.tags, function(realTags) {
+        bookmark.tags = realTags;
+        bookmark.save(function(err, bookmark) {
+            if(err) return console.error(err);
+            res.status(201).send(bookmark.toJson());
+        });
+    });
+}
+
+function updateBookmark(req, res) {
+    Bookmark.findOne({_id: req.swagger.params.bookmark_id.value}, function(err, bookmark) {
+        if(err) return console.error(err);
+
+        bookmark.notes = req.body.notes;
+        bookmark.title = req.body.title;
+        bookmark.url = req.body.url;
+
+        getOrCreateTags(req.body.tags, function(realTags) {
+            bookmark.tags = realTags;
+            bookmark.save(function(err, bookmark) {
+                if(err) return console.error(err);
+                res.send(bookmark.toJson());
+            });
+        });
+    });
 }
 
 function getBookmarks(req, res) {
